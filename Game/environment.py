@@ -11,9 +11,9 @@ class GameWorld():
         self.render = scenegraph
         
         self.camera = camera
-        self.world = self.loader.loadModel("Game/models/world.bam")
+        self.world = self.loader.loadModel("Game/models/maps/city.bam")
         # the model is 1024 already, so we scale accordingly:
-        self.world.setScale(self.worldsize/1024)
+        self.world.setScale(self.worldsize)
         self.world.setPos(0,0,0)
         self.world.reparentTo(self.render)
         self.__createEnvironment()
@@ -21,18 +21,20 @@ class GameWorld():
     # private method
     def __createEnvironment(self):
         # Fog
+        """
         expfog = Fog("scene-wide-fog")
         expfog.setColor(0.5,0.5,0.5)
         expfog.setExpDensity(0.002)
         self.render.setFog(expfog)
- 
+        
         # Our sky
+        
         skysphere = self.loader.loadModel('Game/models/blue-sky-sphere')
         skysphere.setEffect(CompassEffect.make(self.render))
-        skysphere.setScale(0.08)
+        skysphere.setScale(1)
         # NOT render or you'll fly through the sky!:
-        skysphere.reparentTo(self.camera) 
- 
+        #skysphere.reparentTo(self.camera) 
+        
         # Our lighting
         ambientLight = AmbientLight("ambientLight")
         ambientLight.setColor(Vec4(.6, .6, .6, 1))
@@ -45,7 +47,7 @@ class GameWorld():
         dlnp.setHpr(225,-60,0)#lookAt(self.player)
         self.render.setLight(dlnp)
  
-        """# water
+        # water
         self.water = self.loader.loadModel('Game/models/square.egg')
         self.water.setSx(self.worldsize* 2)
         self.water.setSy(self.worldsize*2)
@@ -56,7 +58,7 @@ class GameWorld():
         self.water.setTexScale(nTS,4)
         self.water.reparentTo(self.render)
         LerpTexOffsetInterval(self.water,200,(1,0),(0,0),textureStage=nTS).loop()
- """
+         """
     def setGroundMask(self,mask):
         self.world.setCollideMask(mask)
  

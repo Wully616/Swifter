@@ -8,7 +8,7 @@ from pandac.PandaModules import Vec3,Vec4,BitMask32
 from pandac.PandaModules import CollisionTraverser,CollisionNode
 from pandac.PandaModules import CollisionHandlerQueue,CollisionRay
 from direct.task.Task import Task
-from controller import ActorFSM
+from Game.controller import ActorFSM
 
 class Swifter:
     def __init__(self, model, run, walk, idle, jump, crouch, crouchWalk, startPos, scale):
@@ -188,7 +188,7 @@ class Swifter:
             self.speed = self.speedSprint
         elif(self.crouch is True): # Can't sprint while crouching ;)
             #If we are crouching..
-            print "Crouching!"
+            print ("Crouching!")
             self.walkAnim = "CrouchWalk"
             self.idleAnim = "Crouch"
             self.speed = self.speedCrouch
@@ -205,7 +205,7 @@ class Swifter:
             self.FSM.request(self.idleAnim,1)
             
             #We are idle, feel free to do something else, setting isIdle = False.
-            print "We are Idle but ready to do something: isIdle = False"
+            print ("We are Idle but ready to do something: isIdle = False")
             
         elif(self.isJumping is False and self.isMoving is False and self.isIdle is False):
             #If were not moving or jumping, were not  doing anything, we should probably be idle if we aren't already          
@@ -221,7 +221,7 @@ class Swifter:
                     self.isMoving = True # were now moving
                     self.isIdle = False # were not idle right now 
                     self.FSM.request(self.walkAnim,1)
-                    print "Started running or walking"
+                    print ("Started running or walking")
             #Check if actor is strafing
             if(self.strafe != self.movementMap["stop"]):
                 if(self.isMoving is False or self.FSM.state != self.walkAnim):
@@ -231,11 +231,11 @@ class Swifter:
                     self.isMoving = True # were now moving
                     self.isIdle = False # were not idle right now 
                     self.FSM.request(self.walkAnim,1)
-                    print "Started running or walking"    
+                    print ("Started running or walking")    
         elif(self.isMoving is True and self.isIdle is False):
             #Only switch of isMoving if we were moving and not idle
             self.isMoving = False
-            print "Finished walking"
+            print ("Finished walking")
             
                   
             #if were moving, set isMoving = 1 and call walking FSM
@@ -256,13 +256,13 @@ class Swifter:
                 self.isJumping = True # were jumping 
                 self.isIdle = False # were not idle right now
                 self.FSM.request('Jump',1)
-                print "Started jumping"
+                print ("Started jumping")
         
         #if we are jumping, check the anim has finished and stop jumping
         self.JumpQuery = self.actor.getAnimControl('jump')
         if(self.isJumping is True and self.JumpQuery.isPlaying() is False):
             self.isJumping = False # finished jumping
-            print "Finished Jumping"
+            print ("Finished Jumping")
         
                 
 
