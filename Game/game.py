@@ -15,11 +15,11 @@ from panda3d.core import Vec3, Vec4, ModifierButtons, Point3, VBase3
 from direct.actor.Actor import Actor
 from direct.gui.OnscreenText import OnscreenText
 
-from Game.environment import GameWorld
-from Game.camera3 import Camera
-from Game.player import Swifter
+
+from Game.bulletCamera import Camera
+from Game.bulletPlayer import Player
 from Game.bulletWorld import bWorld
-from Game.bulletController import PandaBulletCharacterController
+from Game.bulletController import kCharacterController
 
 
 loadPrcFileData('','win-size 1280 720')
@@ -65,47 +65,27 @@ class StickFightGame(ShowBase):
         
 
         #Create bullet world
-        self.bWorld = bWorld()
+        self.bWorld = bWorld('Game/models/maps/debug.egg')
                     
         #Add task to process physics
         taskMgr.add(self.update, 'updateWorld')
 
         
         #Set up the player
-        self.Bcharacter = PandaBulletCharacterController(self.bWorld.world, self.bWorld.worldNP, 1.75, 1.3, 0.5, 0.4)
-        self.Bcharacter.setPos(render, Point3(0, 0, 10))
+        self.bController = kCharacterController(self.bWorld.world, self.bWorld.worldNP, 1.75, 1.3, 0.5, 0.4)
+        self.bController.setPos(render, Point3(0, 0, 10))        
         
-        # Parent the player model to the bullet character
+        self.player = Player(self.bController,"Game/models/player/swifter",.1)
         
-        player = Swifter("Game/models/swifter",
-                         "Game/models/swifter-Run",
-                         "Game/models/swifter-Walk",
-                         "Game/models/swifter-Idle",
-                         "Game/models/swifter-Jump",
-                         "Game/models/swifter-IdleCrouch",
-                         "Game/models/swifter-WalkCrouch",
-                         Vec3(0,0,0),
-                         .1)
-                         #environ.find("**/start_point").getPos(),.2)
-        
-        player.actor.clearModelNodes()
-        #Reparent the visual actor node path to the bullet collision node path
-        #this is so when we move the bullet sphere node path, our actor will move
-        
-        player.actor.reparentTo(self.Bcharacter.capsuleNP)
-        self.keyboardSetup(player)
+        self.keyboardSetup(self.player)
         
         # Create a camera to follow the player.
         #base.oobe()  
-        camera = Camera(player.actor)
+
+        # Attach the camera to the bullet controller's capsule node path 
+        camera = Camera(self.bController)
         
-        # Accept some keys to move the camera.
-        """
-        self.accept("g-up", camera.setControl, ["left",0])
-        self.accept("h-up", camera.setControl, ["right",0])
-        self.accept("g", camera.setControl, ["left",1])
-        self.accept("h", camera.setControl, ["right",1])
-        """
+
         # Accept the Esc key to quit the game.
     
         self.accept("escape", sys.exit)   
@@ -113,49 +93,26 @@ class StickFightGame(ShowBase):
         
         
 
-    """      
-    def mouseUpdate(self,task):
-       
-        md = self.win.getPointer(0)
-        x = md.getX()
-        y = md.getY()
-        if self.win.movePointer(0, self.win.getXSize()/2, self.win.getYSize()/2):
-            self.node.setH(self.node.getH() -  (x - self.win.getXSize()/2)*0.1)
-            self.camera.setP(self.camera.getP() - (y - self.win.getYSize()/2)*0.1)
-        return task.cont
-    
-
-    
-    
-    """    
-
     #For processing physic updates
 
     def update(self, task):
         dt = globalClock.getDt()
         
-        """ processes character movement    
-        self.processInput(dt)
-        """
+        
+        """Might be needed later in bulletController"""
         #Get the characters old position, comes from the bullet Char controller
-        oldCharPos = self.Bcharacter.getPos(render)
-        
-        #Used for the camera in this demo, not needed
-        #self.character.setH(base.camera.getH(render))
-        
+        #oldCharPos = self.bController.getPos(render)
+      
         #Runs the update function in the bullet Char controller
         #It will apply physics and movement and check states
-        self.Bcharacter.update() # WIP
+        self.bController.update() # WIP
         
-        newCharPos = self.Bcharacter.getPos(render)
-        delta = newCharPos - oldCharPos
+        """Might be needed later in bulletController"""
+        #newCharPos = self.bController.getPos(render)
+        #delta = newCharPos - oldCharPos
         
         self.bWorld.world.doPhysics(dt, 4, 1./120.)
     
-        """ processes camera    
-        ml.orbitCenter = self.character.getPos(render)
-        base.camera.setPos(base.camera.getPos(render) + delta)
-        """    
         return task.cont        
           
     def keyboardSetup(self,player):

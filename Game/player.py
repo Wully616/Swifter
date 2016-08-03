@@ -8,7 +8,7 @@ from pandac.PandaModules import Vec3,Vec4,BitMask32
 from pandac.PandaModules import CollisionTraverser,CollisionNode
 from pandac.PandaModules import CollisionHandlerQueue,CollisionRay
 from direct.task.Task import Task
-from Game.controller import ActorFSM
+from Game.playerFSM import ActorFSM
 
 class Swifter:
     def __init__(self, model, run, walk, idle, jump, crouch, crouchWalk, startPos, scale):
@@ -23,7 +23,7 @@ class Swifter:
            scale : The amount by which the size of the model will be scaled 
                    (float)
                    
-           """
+        """
         
         #Define movement map and speeds
         self.speedSprint = 20

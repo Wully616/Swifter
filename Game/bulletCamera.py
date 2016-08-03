@@ -1,3 +1,10 @@
+'''
+Created on 2 Aug 2016
+bulletKCC Camera
+Used to control a third person mouse controlled camera.
+It will rotate the provided bullet kinematic character controller based on mouse movement
+@author: Wully
+'''
 from pandac.PandaModules import PandaNode,NodePath,Camera,TextNode
 from pandac.PandaModules import CollisionTraverser,CollisionNode,CollisionSegment
 from pandac.PandaModules import CollisionHandlerQueue,CollisionRay, BitMask32
@@ -21,14 +28,16 @@ class Camera:
     
     """
 
-    def __init__(self,actor):
+    def __init__(self,bController):
         """Initialise the camera, setting it to follow 'actor'.
         
         Arguments:
-        actor -- The Actor that the camera will initially follow.
+        bController -- The bullet character controller that the camera will initially follow.
         
         """
-        self.actor = actor
+        #Get the node path for the CC
+        self.bController = bController
+        self.actor = bController.capsuleNP
         self.prevtime = 0
         self.setUpCamera()
         taskMgr.add(self.mouseUpdate, 'mouse-task')
@@ -43,9 +52,9 @@ class Camera:
         base.camera.reparentTo(self.actor)
         # We don't actually want to point the camera at actors's feet.
         # This value will serve as a vertical offset so we can look over the actor
-        self.cameraTargetHeight = 9.0
+        self.cameraTargetHeight = 0.5
         # How far should the camera be from the actor
-        self.cameraDistance = 30
+        self.cameraDistance = 10
         # Initialize the pitch of the camera
         self.cameraPitch = 45
         
@@ -65,7 +74,9 @@ class Camera:
         # rock or a tree.  If it hits the terrain, we detect the camera's
         # height.  If it hits anything else, the camera is in an illegal
         # position.
-
+        """
+TODO::        This will need to be changed to bullet
+        """
         self.cTrav = CollisionTraverser()
         self.groundRay = CollisionRay()
         self.groundRay.setOrigin(0,0,1000)
@@ -107,9 +118,12 @@ class Camera:
         if base.win.movePointer(0, base.win.getXSize()/2, base.win.getYSize()/2):
             
             #turns the actor
-            self.actor.setH(self.actor.getH() -  (x - base.win.getXSize()/2)*0.1)
+            """
+            Needs to be changed to move the bullet CC node
+            """
             #turns the camera
-            #base.camera.setP(base.camera.getP() - (y - base.win.getYSize()/2)*0.1)
+            self.bController.setH(self.bController.getH() -  (x - base.win.getXSize()/2)*0.1)
+            
             #calculate camera pitch
             self.cameraPitch = self.cameraPitch + (y - base.win.getYSize()/2)*0.1
             if (self.cameraPitch < -60): self.cameraPitch = -60
@@ -154,9 +168,12 @@ class Camera:
             
         # We will detect anything obstructing the camera via a ray trace
         # from the view target around the avatar's head, to the desired camera
-        # podition. If the ray intersects anything, we move the camera to the
+        # position. If the ray intersects anything, we move the camera to the
         # the first intersection point, This brings the camera in between its
-        # ideal position, and any present obstructions.   
+        # ideal position, and any present obstructions.  
+        """
+TODO::        This will need to be changed to bullet
+        """ 
         entries = []
         for i in range(self.cameraColHandler.getNumEntries()):
             entry = self.cameraColHandler.getEntry(i)

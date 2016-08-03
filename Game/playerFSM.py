@@ -8,17 +8,18 @@ from direct.fsm.FSM import FSM
  
 class ActorFSM(FSM):
     
-    def __init__(self, actor):
+    def __init__(self, actor, bController):
         FSM.__init__(self, 'Character')
         #get the actor that we want to move.
+        self.bController = bController
         self.actor = actor
         self.defaultTransitions = {
-            'Walk' : [ 'Run', 'Jump', 'Idle', 'Crouch', 'CrouchWalk'],
-            'CrouchWalk' : [ 'Run', 'Jump', 'Idle', 'Crouch', 'Walk'],
-            'Run' : [ 'Walk', 'Jump', 'Idle', 'Crouch', 'CrouchWalk' ],
-            'Idle' : [ 'Walk', 'Run', 'Jump', 'Crouch', 'CrouchWalk'],
-            'Crouch' : [ 'Idle', 'Run', 'Jump', 'Walk', 'CrouchWalk'],
-            'Jump' : [ 'Idle', 'Run', 'Crouch', 'Walk'],           
+            'Walk' : ['Walk', 'Run', 'Jump', 'Idle', 'IdleCrouch', 'WalkCrouch'],
+            'WalkCrouch' : [ 'Run', 'Jump', 'Idle', 'IdleCrouch', 'Walk'],
+            'Run' : [ 'Walk', 'Jump', 'Idle', 'IdleCrouch', 'WalkCrouch' ],
+            'Idle' : [ 'Walk', 'Run', 'Jump', 'IdleCrouch', 'WalkCrouch'],
+            'IdleCrouch' : [ 'Idle', 'Run', 'Jump', 'Walk', 'WalkCrouch'],
+            'Jump' : [ 'Idle', 'Run', 'IdleCrouch', 'Walk'],           
             }
         """
         self.defaultTransitions = {
@@ -51,21 +52,25 @@ class ActorFSM(FSM):
         self.actor.stop()
         #footstepsSound.stop()
         
-    def enterCrouchWalk(self, animSpeed):
-        self.actor.setPlayRate(animSpeed, 'crouchWalk')
-        self.actor.loop('crouchWalk')
+    def enterWalkCrouch(self, animSpeed):
+        self.bController.startCrouch()
+        self.actor.setPlayRate(animSpeed, 'walk_crouch')
+        self.actor.loop('walk_crouch')
         #footstepsSound.play()
         
-    def exitCrouchWalk(self):
+    def exitWalkCrouch(self):
+        self.bController.stopCrouch()
         self.actor.stop()
         #footstepsSound.stop()  
         
-    def enterCrouch(self, animSpeed):
-        self.actor.setPlayRate(animSpeed, 'crouch')
-        self.actor.loop('crouch')
+    def enterIdleCrouch(self, animSpeed):
+        self.bController.startCrouch()
+        self.actor.setPlayRate(animSpeed, 'idleCrouch')
+        self.actor.loop('idleCrouch')
         #footstepsSound.play()
         
-    def exitCrouch(self):
+    def exitIdleCrouch(self):
+        self.bController.stopCrouch()
         self.actor.stop()
         #footstepsSound.stop()        
                 
@@ -86,6 +91,7 @@ class ActorFSM(FSM):
         self.actor.stop()
         #footstepsSound.stop()
     def enterJump(self, animSpeed):
+        self.bController.startJump(10)
         self.actor.setPlayRate(animSpeed, 'jump')
         self.actor.play('jump')
         #footstepsSound.play()

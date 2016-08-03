@@ -3,7 +3,7 @@ from panda3d.bullet import BulletCapsuleShape, BulletRigidBodyNode, BulletGhostN
 
 import math
 
-class PandaBulletCharacterController(object):
+class kCharacterController(object):
     """
     The custom kinematic character controller for Panda3D, replacing the Bullet's default character controller and providing more stability and features.
     
@@ -26,7 +26,7 @@ class PandaBulletCharacterController(object):
         Parent -- (NodePath) where to parent the KCC elements
         walkHeight -- (float) height of the whole controller when walking
         crouchHeight -- (float) height of the whole controller when crouching
-        stepHeight -- (float) maximum step height the caracter can walk.
+        stepHeight -- (float) maximum step height the character can walk.
         radius -- (float) capsule radius
         gravity -- (float) gravity setting for the character controller, currently as float (gravity is always down). The KCC may sometimes need a different gravity setting then the rest of the world. If this is not given, the gravity is same as world's
         """

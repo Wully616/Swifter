@@ -17,9 +17,10 @@ from direct.task.Task import Task
 
 
 class bWorld():
-    def __init__(self):
-        # Task
-        #taskMgr.add(self.update, 'updateWorld')
+    def __init__(self, map):
+
+        # Model
+        self.map = map
         # Physics
         self.setup()
         globalClock.setMode(globalClock.MLimited) 
@@ -35,7 +36,7 @@ class bWorld():
         self.debugNP = render.attachNewNode(BulletDebugNode('Debug'))
         self.debugNP.node().showWireframe(True)
         self.debugNP.node().showConstraints(True)
-        self.debugNP.node().showBoundingBoxes(False)
+        self.debugNP.node().showBoundingBoxes(True)
         self.debugNP.node().showNormals(False)
         self.debugNP.show()
         
@@ -48,17 +49,16 @@ class bWorld():
         
         # Setup scene 2: city
         # Store the visual model in visNP
-        visNP = loader.loadModel('Game/models/maps/city.egg')
+        visNP = loader.loadModel(self.map)
         visNP.ls()
         #Find all the geom's in the models visual node path;
         #There should only be one so we d ont need to iterate th rough all geoms found
         #This is so we can get the vertex information
         #We want to only find the lowpoly collision mesh geomnodes.
-        geomCollect = visNP.findAllMatches('**/=map=low')
+        geomCollect = visNP.findAllMatches('**/=col=1')
 
         #Create a mesh to store the data.
         mesh = BulletTriangleMesh()
-        
         #loop through all the geoms found and add them to the mesh
         for np in geomCollect:
 
@@ -85,7 +85,7 @@ class bWorld():
         self.world.attachRigidBody(bodyNP.node())
         
         #Reparent the visual node to the collision mesh node
-        visNPHigh = visNP.find('**/=map=high')
+        visNPHigh = visNP.find('**/=vis=1')
         visNPHigh.reparentTo(bodyNP)
         
         self.level = bodyNP
