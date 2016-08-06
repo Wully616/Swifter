@@ -72,7 +72,7 @@ class StickFightGame(ShowBase):
 
         
         #Set up the player
-        self.bController = kCharacterController(self.bWorld.world, self.bWorld.worldNP, 1.75, 1.3, 0.5, 0.4)
+        self.bController = kCharacterController(self.bWorld.world, self.bWorld.worldNP, 1.75, 1.3, 0, 0.4)
         self.bController.setPos(render, Point3(0, 0, 10))        
         
         self.player = Player(self.bController,"Game/models/player/swifter",.1)

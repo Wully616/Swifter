@@ -36,8 +36,8 @@ class bWorld():
         self.debugNP = render.attachNewNode(BulletDebugNode('Debug'))
         self.debugNP.node().showWireframe(True)
         self.debugNP.node().showConstraints(True)
-        self.debugNP.node().showBoundingBoxes(True)
-        self.debugNP.node().showNormals(False)
+        self.debugNP.node().showBoundingBoxes(False)
+        self.debugNP.node().showNormals(True)
         self.debugNP.show()
         
        
@@ -78,7 +78,7 @@ class bWorld():
         bodyNP = self.worldNP.attachNewNode(body)
         #Add the shape we created to the node
         bodyNP.node().addShape(shape)
-        bodyNP.node().setMass(0.0)
+        #bodyNP.node().setMass(0.0)
         bodyNP.setPos(0, 0, 0)
         bodyNP.setCollideMask(BitMask32.allOn())
         #Attach it to the bullet world so its simulated
