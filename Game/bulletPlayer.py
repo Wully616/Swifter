@@ -4,9 +4,9 @@ Creates the Actor along with the animations.
 @author: Wully
 '''
 from direct.actor.Actor import Actor
-from pandac.PandaModules import Vec3,Vec4,BitMask32
-from pandac.PandaModules import CollisionTraverser,CollisionNode
-from pandac.PandaModules import CollisionHandlerQueue,CollisionRay
+from panda3d.core import Vec3,Vec4,BitMask32
+from panda3d.core import CollisionTraverser,CollisionNode
+from panda3d.core import CollisionHandlerQueue,CollisionRay
 from direct.task.Task import Task
 from Game.playerFSM import ActorFSM
 
