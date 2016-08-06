@@ -1,5 +1,5 @@
 from panda3d.core import Vec3, Point3, Quat, BitMask32
-from panda3d.bullet import BulletCapsuleShape, BulletRigidBodyNode, BulletGhostNode
+from panda3d.bullet import BulletCapsuleShape, BulletRigidBodyNode, BulletGhostNode, BulletSphereShape
 
 import math
 
@@ -364,7 +364,7 @@ class kCharacterController(object):
     def __updateCapsule(self):
         self.movementParent.setPos(self.__currentPos)
         self.capsuleNP.setPos(0, 0, self.__capsuleOffset)
-        
+        self.bumpSphereNP.setPos(0, 0, self.__capsuleOffset)
         self.__capsuleTop = self.__currentPos.z + self.__levitation + self.__capsuleH * 2.0
     
     def __applyLinearVelocity(self):
@@ -409,32 +409,48 @@ class kCharacterController(object):
         
         ##########################################################
         # This is a hacky version for when contactTest didn't work
-        #~ for mf in self.__world.getManifolds():
-            #~ if not (mf.getNumManifoldPoints() and self.capsuleNP.node() in [mf.getNode0(), mf.getNode1()]):
-                #~ continue
-            #~ 
-            #~ sign = 1 if mf.getNode0() == self.capsuleNP.node() else -1
-            #~ 
-            #~ for mpoint in mf.getManifoldPoints():
-                #~ direction = mpoint.getPositionWorldOnB() - mpoint.getPositionWorldOnA()
-                #~ normal = Vec3(direction)
-                #~ normal.normalize()
-                #~ 
-                #~ if mpoint.getDistance() < 0:
-                    #~ collisions -= direction * mpoint.getDistance() * 2.0 * sign
         
+        #Gets all the manifold points for the whole world (collision points)
+        for mf in self.__world.getManifolds():
+            #Checks if there is any collisioons and if they are not our capsule, it will ignore it.
+            if not (mf.getNumManifoldPoints() and self.bumpSphereNP.node() in [mf.getNode0(), mf.getNode1()]):
+                continue
+            if (self.capsuleNP.node() in [mf.getNode0(), mf.getNode1()]):
+                continue
+            
+            #Is our capsule in front or behind  
+            sign = 1 if mf.getNode0() == self.bumpSphereNP.node() else -1
+             
+            for mpoint in mf.getManifoldPoints():
+                direction = mpoint.getPositionWorldOnB() - mpoint.getPositionWorldOnA()
+                normal = Vec3(direction)
+                normal.normalize()
+                 
+                if mpoint.getDistance() < 0:
+                    collisions -= direction * mpoint.getDistance() * 2.0 * sign
+        """
         result = self.__world.contactTest(self.capsuleNP.node())
         
         for i, contact in enumerate(result.getContacts()):
+            #Ignore ghosts
             if type(contact.getNode1()) is BulletGhostNode:
+                continue
+            #Ignore the bumpshere           
+            if contact.getNode1() == self.bumpSphereNP.node():
                 continue
             
             mpoint = contact.getManifoldPoint()
-            normal = mpoint.getPositionWorldOnB() - mpoint.getPositionWorldOnA()
+            #Is our capsule in front or behind  
+            #sign = 1 if mpoint.getNode0() == self.capsuleNP.node() else -1
             
+            
+            direction = mpoint.getPositionWorldOnB() - mpoint.getPositionWorldOnA()
+            normal = Vec3(direction)
+            normal.normalize()
+                 
             if mpoint.getDistance() < 0:
-                collisions -= normal * mpoint.getDistance()
-        
+                collisions -= direction * mpoint.getDistance() * 2.0 #* sign
+        """
         collisions.z = 0.0
         self.__currentPos += collisions
     
@@ -500,6 +516,16 @@ class kCharacterController(object):
         self.__addElements()
     
     def __addElements(self):
+        # Bump sphere
+        self.__bumpSphere = BulletSphereShape(self.__walkCapsuleR*1.5)
+        
+        self.__bumpSphereNP = self.movementParent.attachNewNode(BulletRigidBodyNode('Bump'))
+        self.__bumpSphereNP.node().addShape(self.__bumpSphere)
+        self.__bumpSphereNP.node().setKinematic(True)
+        self.__bumpSphereNP.setCollideMask(BitMask32.allOn())
+
+        self.__world.attachRigidBody(self.__bumpSphereNP.node())
+        
         # Walk Capsule
         self.__walkCapsule = BulletCapsuleShape(self.__walkCapsuleR, self.__walkCapsuleH)
         
@@ -507,7 +533,7 @@ class kCharacterController(object):
         self.__walkCapsuleNP.node().addShape(self.__walkCapsule)
         self.__walkCapsuleNP.node().setKinematic(True)
         self.__walkCapsuleNP.setCollideMask(BitMask32.allOn())
-        
+
         self.__world.attachRigidBody(self.__walkCapsuleNP.node())
         
         # Crouch Capsule
@@ -522,5 +548,7 @@ class kCharacterController(object):
         self.capsule = self.__walkCapsule
         self.capsuleNP = self.__walkCapsuleNP
         
+        self.bumpSphere = self.__bumpSphere
+        self.bumpSphereNP = self.__bumpSphereNP
         # Init
         self.__updateCapsule()
