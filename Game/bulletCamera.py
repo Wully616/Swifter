@@ -5,9 +5,9 @@ Used to control a third person mouse controlled camera.
 It will rotate the provided bullet kinematic character controller based on mouse movement
 @author: Wully
 '''
-from pandac.PandaModules import PandaNode,NodePath,Camera,TextNode
-from pandac.PandaModules import CollisionTraverser,CollisionNode,CollisionSegment
-from pandac.PandaModules import CollisionHandlerQueue,CollisionRay, BitMask32
+from panda3d.core import PandaNode,NodePath,Camera,TextNode
+from panda3d.core import CollisionTraverser,CollisionNode,CollisionSegment
+from panda3d.core import CollisionHandlerQueue,CollisionRay, BitMask32
 from panda3d.core import Point3,Vec3
 from direct.task.Task import Task
 from panda3d.core import WindowProperties
